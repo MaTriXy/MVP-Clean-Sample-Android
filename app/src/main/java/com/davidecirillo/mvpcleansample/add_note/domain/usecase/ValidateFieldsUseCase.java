@@ -8,7 +8,9 @@ public class ValidateFieldsUseCase extends BaseUseCase<ValidateFieldsUseCase.Req
     @Override
     protected void executeUseCase(RequestValues requestValues) {
         String text = requestValues.getText();
-        boolean isValid = text != null && !text.isEmpty();
+        String title = requestValues.getTitle();
+        boolean isValid = text != null && !text.isEmpty() &&
+                title != null && !title.isEmpty();
 
         if (isValid) {
             getUseCaseCallback().onSuccess(new ResponseValues());
@@ -19,10 +21,16 @@ public class ValidateFieldsUseCase extends BaseUseCase<ValidateFieldsUseCase.Req
 
     public static class RequestValues implements BaseUseCase.RequestValues {
 
+        private String mTitle;
         private String mText;
 
-        public RequestValues(String text) {
+        public RequestValues(String title, String text) {
+            mTitle = title;
             mText = text;
+        }
+
+        public String getTitle() {
+            return mTitle;
         }
 
         public String getText() {

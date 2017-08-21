@@ -36,7 +36,7 @@ public class SaveNoteUseCaseTest {
     public void testGivenRequestValuesWithNoteWhenExecuteUseCaseThenSaveNoteOnRepository() throws Exception {
         // Given
         SaveNoteUseCase.RequestValues requestValues = mock(SaveNoteUseCase.RequestValues.class);
-        NoteDomainModel noteDomainModel = new NoteDomainModel("");
+        NoteDomainModel noteDomainModel = new NoteDomainModel("", "", 0L);
         given(requestValues.getNoteDomainModel()).willReturn(noteDomainModel);
 
         // When
@@ -50,7 +50,7 @@ public class SaveNoteUseCaseTest {
     public void testGivenRequestValuesWithNoteWhenExecuteUseCaseThenOnSuccessCalledOnCallback() throws Exception {
         // Given
         SaveNoteUseCase.RequestValues requestValues = mock(SaveNoteUseCase.RequestValues.class);
-        NoteDomainModel noteDomainModel = new NoteDomainModel("");
+        NoteDomainModel noteDomainModel = new NoteDomainModel("", "", 0L);
         given(requestValues.getNoteDomainModel()).willReturn(noteDomainModel);
 
         // When

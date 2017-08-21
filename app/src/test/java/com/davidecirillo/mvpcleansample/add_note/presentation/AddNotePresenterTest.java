@@ -1,5 +1,6 @@
 package com.davidecirillo.mvpcleansample.add_note.presentation;
 
+import android.icu.util.Calendar;
 import android.util.Log;
 
 import com.davidecirillo.mvpcleansample.add_note.domain.usecase.ValidateFieldsUseCase;
@@ -11,36 +12,37 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.util.Date;
+
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Log.class)
+@PrepareForTest({Log.class, Calendar.class})
 public class AddNotePresenterTest {
 
-    public static final String VALIDATION_ERROR_MESSAGE = "Please add some text";
+    public static final String VALIDATION_ERROR_MESSAGE = "Please complete all the fields";
     private AddNotePresenter mCut;
 
-    @Mock
-    private UseCaseHandler mUseCaseHandler;
-
-    @Mock
-    private ValidateFieldsUseCase mValidateFieldsUseCase;
-
-    @Mock
-    private AddNoteContract.View mView;
+    @Mock private UseCaseHandler mUseCaseHandler;
+    @Mock private ValidateFieldsUseCase mValidateFieldsUseCase;
+    @Mock private AddNoteContract.View mView;
+    @Mock private Calendar mCalendar;
 
     @Before
     public void setUp() throws Exception {
-        mockStatic(Log.class);
+        mockStatic(Log.class, Calendar.class);
+        given(Calendar.getInstance()).willReturn(mCalendar);
+        given(mCalendar.getTime()).willReturn(mock(Date.class));
 
         mCut = new AddNotePresenter(mUseCaseHandler, mValidateFieldsUseCase);
         mCut.bind(mView);
@@ -49,7 +51,7 @@ public class AddNotePresenterTest {
     @Test
     public void testWhenValidateFieldsThenCorrectUseCaseExecuted() throws Exception {
         // When
-        mCut.validateFields("");
+        mCut.validateFields("", "");
 
         //Then
         verify(mUseCaseHandler, times(1)).execute(
@@ -63,14 +65,14 @@ public class AddNotePresenterTest {
         ArgumentCaptor<BaseUseCase.UseCaseCallback> argumentCaptor = ArgumentCaptor.forClass(BaseUseCase.UseCaseCallback.class);
 
         // Given
-        mCut.validateFields("");
+        mCut.validateFields("", "");
 
         // When
         verify(mUseCaseHandler, times(1)).execute(
                 eq(mValidateFieldsUseCase),
                 any(ValidateFieldsUseCase.RequestValues.class),
                 argumentCaptor.capture());
-        argumentCaptor.getValue().onSuccess(Matchers.anyObject());
+        argumentCaptor.getValue().onSuccess(mock(ValidateFieldsUseCase.ResponseValues.class));
 
         //Then
         verify(mView, times(1)).submitResults(any(NoteViewModel.class));
@@ -81,7 +83,7 @@ public class AddNotePresenterTest {
         ArgumentCaptor<BaseUseCase.UseCaseCallback> argumentCaptor = ArgumentCaptor.forClass(BaseUseCase.UseCaseCallback.class);
 
         // When
-        mCut.validateFields("");
+        mCut.validateFields("", "");
 
         //Then
         verify(mUseCaseHandler, times(1)).execute(
@@ -90,5 +92,22 @@ public class AddNotePresenterTest {
                 argumentCaptor.capture());
         argumentCaptor.getValue().onError();
         verify(mView, times(1)).showError(VALIDATION_ERROR_MESSAGE);
+    }
+
+    @Test
+    public void testGivenValidateFieldsWhenUseCaseOnSuccessCurrentTimeUsed() throws Exception {
+        ArgumentCaptor<BaseUseCase.UseCaseCallback> argumentCaptor = ArgumentCaptor.forClass(BaseUseCase.UseCaseCallback.class);
+
+        // When
+        mCut.validateFields("", "");
+
+        //Then
+        verify(mUseCaseHandler, times(1)).execute(
+                eq(mValidateFieldsUseCase),
+                any(ValidateFieldsUseCase.RequestValues.class),
+                argumentCaptor.capture());
+        argumentCaptor.getValue().onSuccess(mock(ValidateFieldsUseCase.ResponseValues.class));
+
+        verify(mCalendar, times(1)).getTime();
     }
 }

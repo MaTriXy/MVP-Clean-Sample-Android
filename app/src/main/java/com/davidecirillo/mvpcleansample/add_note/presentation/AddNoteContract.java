@@ -12,6 +12,6 @@ interface AddNoteContract {
     }
 
     interface Presenter {
-        void validateFields(String text);
+        void validateFields(String text, String title);
     }
 }

@@ -20,9 +20,11 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -37,12 +39,15 @@ public class NotesPresenterTest {
     @Mock DeleteNoteUseCase mDeleteNoteUseCase;
     @Mock GetNotesUseCase mGetNotesUseCase;
     @Mock NotesContract.View mView;
+    @Mock NoteViewModel mNoteViewModel;
 
     private NotesPresenter mCut;
 
     @Before
     public void setUp() throws Exception {
         PowerMockito.mockStatic(Log.class);
+
+        given(mNoteViewModel.getCreatedAtDate()).willReturn(mock(Date.class));
 
         mCut = new NotesPresenter(mUseCaseHandler, mSaveNoteUseCase, mGetNotesUseCase, mDeleteNoteUseCase);
         mCut.bind(mView);
@@ -71,8 +76,8 @@ public class NotesPresenterTest {
 
         verify(mUseCaseHandler, times(1)).execute(any(BaseUseCase.class), any(BaseUseCase.RequestValues.class), argumentCaptor.capture());
         List<NoteDomainModel> notesFromPrefs = new ArrayList<>();
-        notesFromPrefs.add(new NoteDomainModel("1"));
-        notesFromPrefs.add(new NoteDomainModel("2"));
+        notesFromPrefs.add(new NoteDomainModel("1", "1", 1L));
+        notesFromPrefs.add(new NoteDomainModel("2", "2", 2L));
         argumentCaptor.getValue().onSuccess(new GetNotesUseCase.ResponseValues(notesFromPrefs));
 
         // Then
@@ -103,7 +108,7 @@ public class NotesPresenterTest {
         ArgumentCaptor<BaseUseCase> argumentCaptor = ArgumentCaptor.forClass(BaseUseCase.class);
 
         // When
-        mCut.saveNoteToMemory(mock(NoteViewModel.class));
+        mCut.saveNoteToMemory(mNoteViewModel);
 
         // Verify
         verify(mUseCaseHandler, times(1)).execute(argumentCaptor.capture(), any(BaseUseCase.RequestValues.class), any(BaseUseCase.UseCaseCallback.class));
@@ -116,7 +121,7 @@ public class NotesPresenterTest {
         ArgumentCaptor<BaseUseCase> argumentCaptor = ArgumentCaptor.forClass(BaseUseCase.class);
 
         // When
-        mCut.deleteNoteFromMemory(mock(NoteViewModel.class));
+        mCut.deleteNoteFromMemory(mNoteViewModel);
 
         // Verify
         verify(mUseCaseHandler, times(1)).execute(argumentCaptor.capture(), any(BaseUseCase.RequestValues.class), any(BaseUseCase.UseCaseCallback.class));

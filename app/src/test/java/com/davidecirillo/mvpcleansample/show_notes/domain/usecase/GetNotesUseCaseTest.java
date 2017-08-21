@@ -52,7 +52,7 @@ public class GetNotesUseCaseTest {
 
         // Given
         ArrayList<NoteDomainModel> noteDomainModels = new ArrayList<>();
-        noteDomainModels.add(new NoteDomainModel(""));
+        noteDomainModels.add(new NoteDomainModel("", "", 0L));
         given(mNotesRepository.getNotes()).willReturn(noteDomainModels);
 
         // When

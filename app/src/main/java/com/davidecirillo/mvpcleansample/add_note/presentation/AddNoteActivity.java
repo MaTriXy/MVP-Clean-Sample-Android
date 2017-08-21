@@ -19,7 +19,9 @@ import com.davidecirillo.mvpcleansample.show_notes.presentation.viewmodel.NoteVi
 public class AddNoteActivity extends BaseActivity implements AddNoteContract.View {
 
     public final static String KEY_NOTE_VIEW_MODEL_EXTRA = "NOTE_VIEW_MODEL_EXTRA";
-    private EditText mTextNoteEditText;
+
+    private EditText mContentEditText;
+    private EditText mTitleEditText;
 
     public static Intent getIntent(Context context){
         return new Intent(context, AddNoteActivity.class);
@@ -30,9 +32,16 @@ public class AddNoteActivity extends BaseActivity implements AddNoteContract.Vie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_add_note);
 
-        mTextNoteEditText = (EditText) findViewById(R.id.note_text);
-        mTextNoteEditText.requestFocus();
+        mContentEditText = (EditText) findViewById(R.id.note_text);
+        mTitleEditText = (EditText) findViewById(R.id.note_title);
+
+        // Request focus on first edit text
+        mTitleEditText.requestFocus();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Add new note");
+        }
     }
 
     @Override
@@ -55,6 +64,9 @@ public class AddNoteActivity extends BaseActivity implements AddNoteContract.Vie
     }
 
     public void onAddNoteClick(View view) {
-        ((AddNotePresenter) mBasePresenter).validateFields(mTextNoteEditText.getText().toString());
+        ((AddNotePresenter) mBasePresenter).validateFields(
+                mContentEditText.getText().toString(),
+                mTitleEditText.getText().toString()
+        );
     }
 }

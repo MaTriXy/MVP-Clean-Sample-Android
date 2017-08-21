@@ -1,24 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:padding="8dp"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:padding="8dp">
 
-    <EditText
-        android:inputType="textAutoComplete"
-        android:id="@+id/note_text"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/some_text_here"/>
+        android:layout_height="wrap_content">
 
-    <requestFocus/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <Button
-        style="@style/Base.Widget.AppCompat.Button.Colored"
-        android:layout_width="match_parent"
-        android:onClick="onAddNoteClick"
-        android:layout_height="wrap_content"
-        android:text="@string/add_note"/>
+            <EditText
+                android:id="@+id/note_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/note_title"
+                android:inputType="textCapSentences">
+                <requestFocus />
+            </EditText>
 
-</LinearLayout>
+            <EditText
+                android:id="@+id/note_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top|start"
+                android:hint="@string/note_text"
+                android:inputType="textCapSentences|textMultiLine"
+                android:lines="5"/>
+
+        </LinearLayout>
+
+
+        <Button
+            style="@style/Base.Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:onClick="onAddNoteClick"
+            android:text="@string/add_note"/>
+
+    </FrameLayout>
+
+</ScrollView>

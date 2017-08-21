@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">Notes</string>
     <string name="no_notes_added_yet">No notes added yet</string>
-    <string name="some_text_here">Note text here</string>
+    <string name="note_text">Content</string>
+    <string name="note_title">Title</string>
     <string name="add_note">Add note</string>
     <string name="prefs_note_list">prefs_note_list</string>
+    <string name="switch_view">Switch view</string>
 </resources>

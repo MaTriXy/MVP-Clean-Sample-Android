@@ -5,16 +5,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
+    android:orientation="vertical"
     app:cardUseCompatPadding="true">
 
-    <TextView
+    <LinearLayout
         android:padding="8dp"
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="test"/>
+        android:orientation="vertical">
+
+        <TextView
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:id="@+id/title"
+            android:layout_marginBottom="8dp"
+            tools:text="This is a title of the note asdfasdf asdfasfa asdfasdf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            style="@style/TextAppearance.AppCompat.Small"/>
+
+        <TextView
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="10dp"
+            style="@style/TextAppearance.AppCompat.Small"
+            android:id="@+id/content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Test content here asd asd asd asd asd as das das das da sda sd asd asd asd asd asd asd asd asd asd as das das d asd asd as das"/>
+
+        <TextView
+            android:id="@+id/date"
+            style="@style/TextAppearance.AppCompat.Caption"
+            tools:text="18 - Dec - 2017"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"/>
+
+    </LinearLayout>
+
 
 </android.support.v7.widget.CardView>

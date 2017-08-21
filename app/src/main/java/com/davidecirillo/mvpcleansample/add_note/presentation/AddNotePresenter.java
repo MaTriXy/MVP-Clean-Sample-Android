@@ -1,6 +1,7 @@
 package com.davidecirillo.mvpcleansample.add_note.presentation;
 
 
+import android.icu.util.Calendar;
 import android.support.annotation.NonNull;
 
 import com.davidecirillo.mvpcleansample.add_note.domain.usecase.ValidateFieldsUseCase;
@@ -19,20 +20,20 @@ class AddNotePresenter extends BasePresenterImpl<AddNoteContract.View> implement
     }
 
     @Override
-    public void validateFields(final String text) {
+    public void validateFields(final String text, final String title) {
         mUseCaseHandler.execute(mValidateFieldsUseCase,
-                new ValidateFieldsUseCase.RequestValues(text),
+                new ValidateFieldsUseCase.RequestValues(title, text),
                 new BaseUseCase.UseCaseCallback<ValidateFieldsUseCase.ResponseValues>() {
 
 
                     @Override
                     public void onSuccess(ValidateFieldsUseCase.ResponseValues response) {
-                        getView().submitResults(new NoteViewModel(text));
+                        getView().submitResults(new NoteViewModel(title, text, Calendar.getInstance().getTime()));
                     }
 
                     @Override
                     public void onError() {
-                        getView().showError("Please add some text");
+                        getView().showError("Please complete all the fields");
                     }
                 });
     }

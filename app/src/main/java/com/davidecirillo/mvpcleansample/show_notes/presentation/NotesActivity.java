@@ -2,10 +2,13 @@ package com.davidecirillo.mvpcleansample.show_notes.presentation;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ViewSwitcher;
 
@@ -28,9 +31,11 @@ public class NotesActivity extends BaseActivity implements NotesContract.View, N
 
     private NotesRecyclerViewAdapter mAdapter;
     private Intent mActivityResultIntent;
+    private Menu mOptionMenu;
 
     // Views
     private ViewSwitcher mViewSwitcher;
+    private RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,19 +64,36 @@ public class NotesActivity extends BaseActivity implements NotesContract.View, N
     }
 
     @Override
-    protected BasePresenterImpl createPresenter() {
-        SaveNoteUseCase saveNoteUseCase = new SaveNoteUseCase(mPrefsNoteRepository);
-        GetNotesUseCase getNotesUseCase = new GetNotesUseCase(mPrefsNoteRepository);
-        DeleteNoteUseCase deleteNoteUseCase = new DeleteNoteUseCase(mPrefsNoteRepository);
-        return new NotesPresenter(mUseCaseHandler, saveNoteUseCase, getNotesUseCase, deleteNoteUseCase);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == ADD_NOTE_RESULT_CODE) {
             mActivityResultIntent = data;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.note_list_menu, menu);
+        mOptionMenu = menu;
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.switch_view:
+                handleSwitchRecyclerViewLayout();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected BasePresenterImpl createPresenter() {
+        SaveNoteUseCase saveNoteUseCase = new SaveNoteUseCase(mPrefsNoteRepository);
+        GetNotesUseCase getNotesUseCase = new GetNotesUseCase(mPrefsNoteRepository);
+        DeleteNoteUseCase deleteNoteUseCase = new DeleteNoteUseCase(mPrefsNoteRepository);
+        return new NotesPresenter(mUseCaseHandler, saveNoteUseCase, getNotesUseCase, deleteNoteUseCase);
     }
 
     @Override
@@ -89,25 +111,6 @@ public class NotesActivity extends BaseActivity implements NotesContract.View, N
         mViewSwitcher.setDisplayedChild(EMPTY_PLACEHOLDER_POSITION);
     }
 
-    public void onFabButtonClick(View view) {
-        startActivityForResult(AddNoteActivity.getIntent(this), ADD_NOTE_RESULT_CODE);
-    }
-
-    private void setupNoteRecyclerView() {
-        mAdapter = new NotesRecyclerViewAdapter();
-        mAdapter.setNoteChangeObserver(this);
-
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.notes_recycler_view);
-        recyclerView.setHasFixedSize(false);
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL));
-        recyclerView.setAdapter(mAdapter);
-
-        // Swipe item touch helper
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(recyclerView);
-    }
-
     @Override
     public void onNoteListChanged(int oldItemCount, int newItemCount) {
         ((NotesPresenter) mBasePresenter).showListOrEmptyPlaceholder(oldItemCount, newItemCount);
@@ -116,5 +119,40 @@ public class NotesActivity extends BaseActivity implements NotesContract.View, N
     @Override
     public void onItemDeleted(NoteViewModel noteViewModel) {
         ((NotesPresenter) mBasePresenter).deleteNoteFromMemory(noteViewModel);
+    }
+
+    public void onFabButtonClick(View view) {
+        startActivityForResult(AddNoteActivity.getIntent(this), ADD_NOTE_RESULT_CODE);
+    }
+
+    private void setupNoteRecyclerView() {
+        mAdapter = new NotesRecyclerViewAdapter();
+        mAdapter.setNoteChangeObserver(this);
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.notes_recycler_view);
+        mRecyclerView.setHasFixedSize(false);
+        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL));
+        mRecyclerView.setAdapter(mAdapter);
+
+        // Swipe item touch helper
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(mRecyclerView);
+    }
+
+    private void handleSwitchRecyclerViewLayout() {
+        // This is not persisted in memory atm
+        if (mRecyclerView != null && mOptionMenu != null) {
+
+            int icon;
+            if (mRecyclerView.getLayoutManager() instanceof StaggeredGridLayoutManager) {
+                mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+                icon = R.drawable.ic_view_quilt_white_24dp;
+            } else {
+                mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL));
+                icon = R.drawable.ic_view_stream_white_24dp;
+            }
+            mOptionMenu.getItem(0).setIcon(ContextCompat.getDrawable(this, icon));
+        }
     }
 }
