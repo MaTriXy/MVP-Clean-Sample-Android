@@ -15,7 +15,6 @@ import android.widget.ViewSwitcher;
 import com.davidecirillo.mvpcleansample.R;
 import com.davidecirillo.mvpcleansample.add_note.presentation.AddNoteActivity;
 import com.davidecirillo.mvpcleansample.common.presentation.BaseActivity;
-import com.davidecirillo.mvpcleansample.common.presentation.BasePresenterImpl;
 import com.davidecirillo.mvpcleansample.show_notes.domain.usecase.DeleteNoteUseCase;
 import com.davidecirillo.mvpcleansample.show_notes.domain.usecase.GetNotesUseCase;
 import com.davidecirillo.mvpcleansample.show_notes.domain.usecase.SaveNoteUseCase;
@@ -37,18 +36,19 @@ public class NotesActivity extends BaseActivity implements NotesContract.View, N
     private ViewSwitcher mViewSwitcher;
     private RecyclerView mRecyclerView;
 
+    private NotesPresenter mNotesPresenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes);
 
-        mViewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
+        createPresenter();
 
         setupNoteRecyclerView();
 
-        ((NotesPresenter) mBasePresenter).populateNotesFromPrefs();
+        mViewSwitcher = (ViewSwitcher) findViewById(R.id.view_switcher);
     }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -56,7 +56,7 @@ public class NotesActivity extends BaseActivity implements NotesContract.View, N
         if (mActivityResultIntent != null && mActivityResultIntent.hasExtra(AddNoteActivity.KEY_NOTE_VIEW_MODEL_EXTRA)) {
             NoteViewModel noteViewModel = mActivityResultIntent.getParcelableExtra(AddNoteActivity.KEY_NOTE_VIEW_MODEL_EXTRA);
 
-            ((NotesPresenter) mBasePresenter).saveNoteToMemory(noteViewModel);
+            mNotesPresenter.saveNoteToMemory(noteViewModel);
             mActivityResultIntent = null;
 
             showNewNote(noteViewModel);
@@ -89,14 +89,6 @@ public class NotesActivity extends BaseActivity implements NotesContract.View, N
     }
 
     @Override
-    protected BasePresenterImpl createPresenter() {
-        SaveNoteUseCase saveNoteUseCase = new SaveNoteUseCase(mPrefsNoteRepository);
-        GetNotesUseCase getNotesUseCase = new GetNotesUseCase(mPrefsNoteRepository);
-        DeleteNoteUseCase deleteNoteUseCase = new DeleteNoteUseCase(mPrefsNoteRepository);
-        return new NotesPresenter(mUseCaseHandler, saveNoteUseCase, getNotesUseCase, deleteNoteUseCase);
-    }
-
-    @Override
     public void showNewNote(NoteViewModel noteViewModel) {
         mAdapter.addNote(noteViewModel);
     }
@@ -113,16 +105,24 @@ public class NotesActivity extends BaseActivity implements NotesContract.View, N
 
     @Override
     public void onNoteListChanged(int oldItemCount, int newItemCount) {
-        ((NotesPresenter) mBasePresenter).showListOrEmptyPlaceholder(oldItemCount, newItemCount);
+        mNotesPresenter.showListOrEmptyPlaceholder(oldItemCount, newItemCount);
     }
 
     @Override
     public void onItemDeleted(NoteViewModel noteViewModel) {
-        ((NotesPresenter) mBasePresenter).deleteNoteFromMemory(noteViewModel);
+        mNotesPresenter.deleteNoteFromMemory(noteViewModel);
     }
 
     public void onFabButtonClick(View view) {
         startActivityForResult(AddNoteActivity.getIntent(this), ADD_NOTE_RESULT_CODE);
+    }
+
+    private void createPresenter() {
+        SaveNoteUseCase saveNoteUseCase = new SaveNoteUseCase(mPrefsNoteRepository);
+        GetNotesUseCase getNotesUseCase = new GetNotesUseCase(mPrefsNoteRepository);
+        DeleteNoteUseCase deleteNoteUseCase = new DeleteNoteUseCase(mPrefsNoteRepository);
+        mNotesPresenter = new NotesPresenter(mUseCaseHandler, saveNoteUseCase, getNotesUseCase, deleteNoteUseCase);
+        bindPresenterToView(mNotesPresenter);
     }
 
     private void setupNoteRecyclerView() {

@@ -4,7 +4,7 @@ package com.davidecirillo.mvpcleansample.show_notes.presentation;
 import com.davidecirillo.mvpcleansample.common.domain.BaseUseCase;
 import com.davidecirillo.mvpcleansample.common.domain.EmptyUseCaseCallback;
 import com.davidecirillo.mvpcleansample.common.domain.UseCaseHandler;
-import com.davidecirillo.mvpcleansample.common.presentation.BasePresenterImpl;
+import com.davidecirillo.mvpcleansample.common.presentation.BasePresenter;
 import com.davidecirillo.mvpcleansample.show_notes.domain.model.NoteDomainModel;
 import com.davidecirillo.mvpcleansample.show_notes.domain.usecase.DeleteNoteUseCase;
 import com.davidecirillo.mvpcleansample.show_notes.domain.usecase.GetNotesUseCase;
@@ -12,7 +12,7 @@ import com.davidecirillo.mvpcleansample.show_notes.domain.usecase.SaveNoteUseCas
 import com.davidecirillo.mvpcleansample.show_notes.presentation.viewmodel.NoteViewModel;
 import com.davidecirillo.mvpcleansample.show_notes.presentation.viewmodel.NoteViewModelMapper;
 
-class NotesPresenter extends BasePresenterImpl<NotesContract.View> implements NotesContract.Presenter {
+class NotesPresenter extends BasePresenter<NotesContract.View> implements NotesContract.Presenter {
 
     private SaveNoteUseCase mSaveNoteUseCase;
     private final GetNotesUseCase mGetNotesUseCase;
@@ -34,8 +34,10 @@ class NotesPresenter extends BasePresenterImpl<NotesContract.View> implements No
 
             @Override
             public void onSuccess(GetNotesUseCase.ResponseValues response) {
+                // Iterate through the domain models, convert them into view models and show them to the screen
                 for (NoteDomainModel noteDomainModel : response.getNoteDomainModels()) {
                     NoteViewModel noteViewModel = NoteViewModelMapper.toViewModel(noteDomainModel);
+
                     getView().showNewNote(noteViewModel);
                 }
             }

@@ -7,10 +7,10 @@ import android.support.annotation.NonNull;
 import com.davidecirillo.mvpcleansample.add_note.domain.usecase.ValidateFieldsUseCase;
 import com.davidecirillo.mvpcleansample.common.domain.BaseUseCase;
 import com.davidecirillo.mvpcleansample.common.domain.UseCaseHandler;
-import com.davidecirillo.mvpcleansample.common.presentation.BasePresenterImpl;
+import com.davidecirillo.mvpcleansample.common.presentation.BasePresenter;
 import com.davidecirillo.mvpcleansample.show_notes.presentation.viewmodel.NoteViewModel;
 
-class AddNotePresenter extends BasePresenterImpl<AddNoteContract.View> implements AddNoteContract.Presenter {
+class AddNotePresenter extends BasePresenter<AddNoteContract.View> implements AddNoteContract.Presenter {
 
     private ValidateFieldsUseCase mValidateFieldsUseCase;
 

@@ -12,13 +12,13 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-public class PrefsNotesRepositoryImpl implements NotesRepository {
+public class PreferenceNotesRepository implements NotesRepository {
 
     private Gson mGson;
     private Type mNoteListType;
     private Context mContext;
 
-    public PrefsNotesRepositoryImpl(Context context) {
+    public PreferenceNotesRepository(Context context) {
         mContext = context;
         mGson = new Gson();
         mNoteListType = new TypeToken<ArrayList<NoteDomainModel>>() {

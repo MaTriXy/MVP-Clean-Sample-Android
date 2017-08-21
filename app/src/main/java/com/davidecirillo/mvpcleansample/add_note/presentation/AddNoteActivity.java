@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.davidecirillo.mvpcleansample.R;
 import com.davidecirillo.mvpcleansample.add_note.domain.usecase.ValidateFieldsUseCase;
 import com.davidecirillo.mvpcleansample.common.presentation.BaseActivity;
-import com.davidecirillo.mvpcleansample.common.presentation.BasePresenterImpl;
 import com.davidecirillo.mvpcleansample.show_notes.presentation.viewmodel.NoteViewModel;
 
 public class AddNoteActivity extends BaseActivity implements AddNoteContract.View {
@@ -22,6 +21,7 @@ public class AddNoteActivity extends BaseActivity implements AddNoteContract.Vie
 
     private EditText mContentEditText;
     private EditText mTitleEditText;
+    private AddNotePresenter mPresenter;
 
     public static Intent getIntent(Context context){
         return new Intent(context, AddNoteActivity.class);
@@ -31,6 +31,8 @@ public class AddNoteActivity extends BaseActivity implements AddNoteContract.Vie
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_add_note);
+
+        createPresenter();
 
         mContentEditText = (EditText) findViewById(R.id.note_text);
         mTitleEditText = (EditText) findViewById(R.id.note_title);
@@ -57,14 +59,14 @@ public class AddNoteActivity extends BaseActivity implements AddNoteContract.Vie
         Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    protected BasePresenterImpl createPresenter() {
+    protected void createPresenter() {
         ValidateFieldsUseCase validateFieldsUseCase = new ValidateFieldsUseCase();
-        return new AddNotePresenter(mUseCaseHandler, validateFieldsUseCase);
+        mPresenter = new AddNotePresenter(mUseCaseHandler, validateFieldsUseCase);
+        bindPresenterToView(mPresenter);
     }
 
     public void onAddNoteClick(View view) {
-        ((AddNotePresenter) mBasePresenter).validateFields(
+        mPresenter.validateFields(
                 mContentEditText.getText().toString(),
                 mTitleEditText.getText().toString()
         );

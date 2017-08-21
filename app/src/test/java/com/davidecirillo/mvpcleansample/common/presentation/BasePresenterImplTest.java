@@ -19,13 +19,13 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 @PrepareForTest(Log.class)
 public class BasePresenterImplTest {
 
-    private BasePresenterImpl mCut;
+    private BasePresenter mCut;
 
     @Before
     public void setUp() throws Exception {
         mockStatic(Log.class);
 
-        mCut = new BasePresenterImpl(mock(UseCaseHandler.class));
+        mCut = new BasePresenter(mock(UseCaseHandler.class));
     }
 
     @Test
